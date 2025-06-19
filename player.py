@@ -16,6 +16,9 @@ class Player(CircleShape):
     def draw(self, screen):
         pygame.draw.polygon(screen,"white",self.triangle(),2)
 
+        if DEBUG:
+            pygame.draw.circle(screen,"red",self.position,self.radius,width=2)
+
     #Updates position and orientation of triangle based on key press
     def update(self, dt):
 
@@ -59,14 +62,29 @@ class Player(CircleShape):
         new_shot.velocity = pygame.Vector2(0,1).rotate(self.rotation) * PLAYER_SHOOT_SPEED
 
 
-
-
-
-    # Calculates points of a triangle for player model
-    def triangle(self):
+    def triangle(self, scale: float = 2.0) -> list[pygame.Vector2]:
+        """
+        Return the three vertices of an isosceles triangle that fully encloses
+        the circular hit-box (self.radius).  `scale` > 1 enlarges the triangle;
+        lower the value if you want it tighter.
+        """
+        # “Forward” points along the ship's nose; “right” is a wing-tip direction.
         forward = pygame.Vector2(0, 1).rotate(self.rotation)
-        right = pygame.Vector2(0, 1).rotate(self.rotation + 90) * self.radius / 1.5
-        a = self.position + forward * self.radius
-        b = self.position - forward * self.radius - right
-        c = self.position - forward * self.radius + right
-        return [a, b, c] 
+        right   = pygame.Vector2(0, 1).rotate(self.rotation + 90)
+
+        # Triangle dimensions
+        height = self.radius * scale * 2        # nose to base
+        half_base = self.radius * scale / 1.5   # base half-width
+
+        # For isosceles, a good approximation: incenter is ~1/3 from base to tip
+        incenter_offset = forward * (height / 3)
+
+        #Tip
+        a = self.position + forward * (2 * height / 3)
+
+        # Base Corners 
+        base_center = self.position - incenter_offset
+        b = base_center - right * half_base  # left wing
+        c = base_center + right * half_base  # right wing
+        return [a, b, c]
+

@@ -20,12 +20,13 @@ def main():
     game_clock = pygame.time.Clock()
     dt = 0
 
-    font = pygame.font.SysFont('Arial',15)
+    font = pygame.font.SysFont('Arial',int(20 * SCALE))
 
     game_surface = pygame.Surface((BOARD_HEIGHT,BOARD_WIDTH))
     game_surface.fill(color)
 
     screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+    
     
    
     asteroids = pygame.sprite.Group()
